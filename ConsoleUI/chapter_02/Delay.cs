@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConsoleUI.chapter_02
@@ -59,6 +60,26 @@ namespace ConsoleUI.chapter_02
             // Попробовать в последний раз и разрешить распространение ошибки.
             logger.LogInformation("Last request.");
             return await client.GetStringAsync(uri);
+        }
+
+        /// <summary>
+        /// Task.Delay также можно использовать для организации простого тайм-аута.
+        /// Если в операции происходит тайм-аут, она не отменяется. 
+        /// Здесь задача загрузки продолжит прием данных и загрузит весь ответ перед тем, как потерять его.
+        /// Если нужно реализовать тайм-аут, лучшим кандидатом будет CancellationToken.
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        async Task<string> DownloadStringWithTimeout(HttpClient client, string uri)
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            Task<string> downloadTask = client.GetStringAsync(uri);
+            Task timeoutTask = Task.Delay(Timeout.InfiniteTimeSpan, cts.Token);
+            Task completedTask = await Task.WhenAny(downloadTask, timeoutTask);
+            if (completedTask == timeoutTask)
+                return null;
+            return await downloadTask;
         }
     }
 }
