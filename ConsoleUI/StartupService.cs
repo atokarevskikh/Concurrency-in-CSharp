@@ -20,8 +20,9 @@ namespace ConsoleUI
         public void Run()
         {
             logger.LogInformation("Method Run started");
-            
 
+            var task =TestMySynchronousImplementation();
+            task.Wait();
 
             logger.LogInformation("Method Run stoped");
         }
@@ -47,6 +48,22 @@ namespace ConsoleUI
                 logger.LogInformation("Length of page is {pageLength}", htmlPage.Length);
             }
             logger.LogInformation("End testing download with retries");
+        }
+
+        async Task TestMySynchronousImplementation()
+        {
+            var mySynchronousImplementation = new chapter_02.MySynchronousImplementation();
+            var result = await mySynchronousImplementation.GetValueAsync();
+            logger.LogInformation("result = {result}", result);
+            try
+            {
+                await mySynchronousImplementation.NotImplementedAsync<int>();
+                logger.LogInformation("This will not be print.");
+            }
+            catch (NotImplementedException ex)
+            {
+                logger.LogInformation("NotImplementedException was thrown. {message}", ex.Message);
+            }
         }
     }
 }
