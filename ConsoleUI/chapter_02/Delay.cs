@@ -11,13 +11,6 @@ namespace ConsoleUI.chapter_02
 {
     public class Delay
     {
-        private readonly ILogger logger;
-
-        public Delay(ILogger logger)
-        {
-            this.logger = logger;
-        }
-
         /// <summary>
         /// Требуется (асинхронно) приостановить выполнение программы на некоторый период времени. 
         /// Такая ситуация часто встречается при модульном тестировании или реализации задержки для повторного использования. 
@@ -48,7 +41,6 @@ namespace ConsoleUI.chapter_02
             {
                 try
                 {
-                    logger.LogInformation("Request. Next delay will be {nextDelay}", nextDelay);
                     return await client.GetStringAsync(uri);
                 }
                 catch
@@ -58,7 +50,6 @@ namespace ConsoleUI.chapter_02
                 nextDelay = nextDelay + nextDelay;
             }
             // Попробовать в последний раз и разрешить распространение ошибки.
-            logger.LogInformation("Last request.");
             return await client.GetStringAsync(uri);
         }
 
